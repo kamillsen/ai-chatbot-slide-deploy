@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { User } from "next-auth";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 import {
   AlertDialog,
@@ -101,6 +102,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
   const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const id = pathname?.startsWith("/chat/") ? pathname.split("/")[2] : null;
+  const { mutate: mutateGlobal } = useSWRConfig();
 
   const {
     data: paginatedChatHistories,
@@ -147,6 +149,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
             }));
           }
         });
+        mutateGlobal("/api/documents?kind=slides");
 
         if (isCurrentChat) {
           router.replace("/");

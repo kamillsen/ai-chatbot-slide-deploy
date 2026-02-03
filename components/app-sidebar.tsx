@@ -57,6 +57,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
       loading: "Deleting all chats...",
       success: () => {
         mutate(unstable_serialize(getChatHistoryPaginationKey));
+        mutate("/api/documents?kind=slides");
         setShowDeleteAllDialog(false);
         router.replace("/");
         router.refresh();

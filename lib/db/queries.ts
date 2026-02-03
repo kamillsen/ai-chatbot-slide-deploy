@@ -139,6 +139,12 @@ export async function saveChat({
 
 export async function deleteChatById({ id }: { id: string }) {
   try {
+    const messages = await getMessagesByChatId({ id });
+    const documentIds = extractDocumentIdsFromMessages(messages);
+    for (const documentId of documentIds) {
+      await deleteDocumentById({ id: documentId });
+    }
+
     await db.delete(vote).where(eq(vote.chatId, id));
     await db.delete(message).where(eq(message.chatId, id));
     await db.delete(stream).where(eq(stream.chatId, id));
@@ -168,6 +174,15 @@ export async function deleteAllChatsByUserId({ userId }: { userId: string }) {
     }
 
     const chatIds = userChats.map((c) => c.id);
+
+    const messages = await db
+      .select({ parts: message.parts })
+      .from(message)
+      .where(inArray(message.chatId, chatIds));
+    const documentIds = extractDocumentIdsFromMessages(messages);
+    for (const documentId of documentIds) {
+      await deleteDocumentById({ id: documentId });
+    }
 
     await db.delete(vote).where(inArray(vote.chatId, chatIds));
     await db.delete(message).where(inArray(message.chatId, chatIds));
@@ -450,6 +465,49 @@ export async function getDocumentsByUserIdAndKind({
     throw new ChatSDKError(
       "bad_request:database",
       "Failed to get documents by user and kind"
+    );
+  }
+}
+
+/** Sohbet mesajlarındaki tool-createDocument / tool-updateDocument part'larından doküman id'lerini toplar. */
+function extractDocumentIdsFromMessages(
+  messages: Array<{ parts: unknown }>
+): string[] {
+  const ids = new Set<string>();
+  for (const msg of messages) {
+    const parts = Array.isArray(msg.parts) ? msg.parts : [];
+    for (const part of parts) {
+      if (typeof part !== "object" || part === null) continue;
+      const p = part as Record<string, unknown>;
+      const type = p.type;
+      if (type === "tool-createDocument" && p.output && typeof p.output === "object") {
+        const out = p.output as Record<string, unknown>;
+        if (!("error" in out) && typeof out.id === "string") ids.add(out.id);
+      }
+      if (type === "tool-updateDocument") {
+        if (p.args && typeof p.args === "object") {
+          const args = p.args as Record<string, unknown>;
+          if (typeof args.id === "string") ids.add(args.id);
+        }
+        if (p.output && typeof p.output === "object") {
+          const out = p.output as Record<string, unknown>;
+          if (!("error" in out) && typeof out.id === "string") ids.add(out.id);
+        }
+      }
+    }
+  }
+  return [...ids];
+}
+
+/** Bir dokümanın tüm versiyonlarını ve ilgili suggestion'ları siler. */
+export async function deleteDocumentById({ id }: { id: string }) {
+  try {
+    await db.delete(suggestion).where(eq(suggestion.documentId, id));
+    await db.delete(document).where(eq(document.id, id));
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to delete document by id"
     );
   }
 }

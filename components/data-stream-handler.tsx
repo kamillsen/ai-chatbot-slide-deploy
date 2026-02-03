@@ -22,6 +22,9 @@ export function DataStreamHandler() {
     const newDeltas = dataStream.slice();
     setDataStream([]);
 
+    let hadSlidesKindInBatch = false;
+    let slidesFinishTimeoutId: ReturnType<typeof setTimeout> | undefined;
+
     for (const delta of newDeltas) {
       // Handle chat title updates
       if (delta.type === "data-chat-title") {
@@ -39,6 +42,20 @@ export function DataStreamHandler() {
           setArtifact,
           setMetadata,
         });
+      }
+
+      if (delta.type === "data-kind" && delta.data === "slides") {
+        hadSlidesKindInBatch = true;
+      }
+      // Slayt oluşturma bittiğinde sidebar Slides listesini yenile; sunucu kaydı gecikmeli olabilir, 2s sonra tekrar dene
+      if (
+        delta.type === "data-finish" &&
+        (artifact.kind === "slides" || hadSlidesKindInBatch)
+      ) {
+        mutate("/api/documents?kind=slides");
+        slidesFinishTimeoutId = setTimeout(() => {
+          mutate("/api/documents?kind=slides");
+        }, 2000);
       }
 
       setArtifact((draftArtifact) => {
@@ -86,6 +103,12 @@ export function DataStreamHandler() {
         }
       });
     }
+
+    return () => {
+      if (slidesFinishTimeoutId !== undefined) {
+        clearTimeout(slidesFinishTimeoutId);
+      }
+    };
   }, [dataStream, setArtifact, setMetadata, artifact, setDataStream, mutate]);
 
   return null;

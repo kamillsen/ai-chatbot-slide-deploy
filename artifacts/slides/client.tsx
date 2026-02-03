@@ -12,13 +12,19 @@ export const slidesArtifact = new Artifact<"slides", Metadata>({
   description: "Useful for creating slide decks and presentations",
   initialize: () => undefined,
   onStreamPart: ({ setArtifact, streamPart }) => {
-    // Sunucudan gelen slayt JSON'u; paneli açıp içeriği günceller.
+    // Sunucudan gelen slayt JSON'u; içeriği günceller. Stream sırasında panel açılmaz.
     if (streamPart.type === "data-slidesDelta") {
       setArtifact((draftArtifact) => ({
         ...draftArtifact,
         content: streamPart.data,
-        isVisible: true,
         status: "streaming",
+      }));
+    }
+    // Bittikten sonra panel açılır.
+    if (streamPart.type === "data-finish") {
+      setArtifact((draftArtifact) => ({
+        ...draftArtifact,
+        isVisible: true,
       }));
     }
   },
