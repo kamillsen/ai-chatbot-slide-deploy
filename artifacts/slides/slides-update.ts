@@ -71,7 +71,7 @@ export async function updateSlidesTargeted(
 
   if (target === "content") {
     // Hem başlık hem gövde: LLM (getSlidesArtifactModel) ile güncelle.
-    const contentPrompt = `Update only the body text (and optionally the title) of this slide. Current title: "${slide.title}". Current body: "${slide.body}". User request: ${prompt}. Reply with a JSON object: { "title": "string", "body": "string" }. Keep the same title unless the user asks to change it.`;
+    const contentPrompt = `Update only the body text (and optionally the title) of this slide. Current title: "${slide.title}". Current body: "${slide.body}". User request: ${prompt}. Reply with a JSON object: { "title": "string", "body": "string" }. Keep the same title unless the user asks to change it. If the user does not specify sentence count, the body must be at least 4 sentences.`;
     try {
       const { object } = await generateObject({
         model: getSlidesArtifactModel(),
@@ -111,7 +111,7 @@ export async function updateSlidesTargeted(
       const { object } = await generateObject({
         model: getSlidesArtifactModel(),
         system:
-          "You output only valid JSON. No markdown, no explanation. Return a single string in a key 'body'.",
+          "You output only valid JSON. No markdown, no explanation. Return a single string in a key 'body'. If the user does not specify sentence count, the body must be at least 4 sentences.",
         prompt: `Update the slide body. Current body: "${slide.body}". User request: ${prompt}. Reply with JSON: { "body": "string" }.`,
         schema: z.object({ body: z.string() }),
       });

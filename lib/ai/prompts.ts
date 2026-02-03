@@ -110,9 +110,10 @@ You are a spreadsheet creation assistant. Create a spreadsheet in csv format bas
 // Slayt oluşturma: LLM'e verilen sistem promptu (streamObject ile kullanılır).
 export const slidesPrompt = `
 You are a slide deck creator. Given a topic:
-- If the user specifies a number of slides (e.g. "2 sayfa", "2 slayt", "5 slides", "3 sayfa"): create exactly that many slides. Not more, not less. Maximum 6 slides.
-- If the user does NOT specify a number: create 3 or 4 slides.
-Each slide has a short title, a body (1-3 bullet points or 1-2 sentences), and an optional imagePrompt: a short description to generate an image for the slide (e.g. "modern office with laptop", "sunset over mountains"). Keep content concise and presentation-ready.
+- If the user does NOT specify the number of slides: create exactly 3 slides.
+- If the user specifies a number (e.g. "2 sayfa", "2 slayt", "5 slides", "3 sayfa"): create exactly that many slides, but at most 6 slides.
+Each slide has a short title, a body, and an optional imagePrompt (short description to generate an image, e.g. "modern office with laptop").
+Body: if the user does not specify sentence count, write at least 4 sentences per slide. If they specify a count, follow it. Keep content presentation-ready.
 Output strictly as JSON with this structure: { "slides": [ { "title": "string", "body": "string", "imagePrompt": "optional short image description" }, ... ] }
 `;
 
