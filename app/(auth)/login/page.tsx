@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useActionState, useEffect, useState } from "react";
 
 import { AuthForm } from "@/components/auth-form";
+import { GoogleIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/submit-button";
 import { toast } from "@/components/toast";
 import { type LoginActionState, login } from "../actions";
@@ -55,8 +57,30 @@ export default function Page() {
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
           <h3 className="font-semibold text-xl dark:text-zinc-50">Sign In</h3>
           <p className="text-gray-500 text-sm dark:text-zinc-400">
-            Use your email and password to sign in
+            Use your email and password or sign in with Google
           </p>
+        </div>
+        <div className="flex flex-col gap-4 px-4 sm:px-16">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+          >
+            <GoogleIcon className="size-4" />
+            Sign in with Google
+          </Button>
+          <div className="relative">
+            <span
+              className="absolute inset-0 flex items-center"
+              aria-hidden
+            >
+              <span className="w-full border-t border-border" />
+            </span>
+            <span className="relative flex justify-center text-gray-500 text-xs uppercase dark:text-zinc-400">
+              or
+            </span>
+          </div>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>

@@ -62,6 +62,39 @@ export async function createUser(email: string, password: string) {
   }
 }
 
+export async function getOrCreateUserByEmail(
+  email: string
+): Promise<{ id: string; email: string }> {
+  try {
+    const users = await getUser(email);
+
+    if (users.length > 0) {
+      const [existing] = users;
+      return { id: existing.id, email: existing.email };
+    }
+
+    const [created] = await db
+      .insert(user)
+      .values({ email, password: null })
+      .returning({ id: user.id, email: user.email });
+
+    if (!created) {
+      throw new ChatSDKError(
+        "bad_request:database",
+        "Failed to create user by email"
+      );
+    }
+
+    return { id: created.id, email: created.email };
+  } catch (error) {
+    if (error instanceof ChatSDKError) throw error;
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get or create user by email"
+    );
+  }
+}
+
 export async function createGuestUser() {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
