@@ -419,6 +419,41 @@ export async function getDocumentById({ id }: { id: string }) {
   }
 }
 
+/** Kullanıcının belirtilen kind'taki son versiyonlarını döner (her document id için en son kayıt). */
+export async function getDocumentsByUserIdAndKind({
+  userId,
+  kind,
+  limit = 50,
+}: {
+  userId: string;
+  kind: ArtifactKind;
+  limit?: number;
+}) {
+  try {
+    const rows = await db
+      .select()
+      .from(document)
+      .where(
+        and(eq(document.userId, userId), eq(document.kind, kind))
+      )
+      .orderBy(desc(document.createdAt))
+      .limit(limit * 3);
+
+    const byId = new Map<string, (typeof rows)[0]>();
+    for (const row of rows) {
+      if (!byId.has(row.id)) {
+        byId.set(row.id, row);
+      }
+    }
+    return Array.from(byId.values()).slice(0, limit);
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get documents by user and kind"
+    );
+  }
+}
+
 export async function deleteDocumentsByIdAfterTimestamp({
   id,
   timestamp,

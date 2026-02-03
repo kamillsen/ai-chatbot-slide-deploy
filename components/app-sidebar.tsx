@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { User } from "next-auth";
 import { useState } from "react";
@@ -12,12 +13,19 @@ import {
   getChatHistoryPaginationKey,
   SidebarHistory,
 } from "@/components/sidebar-history";
+import { SidebarSlidesHistory } from "@/components/sidebar-slides-history";
 import { SidebarUserNav } from "@/components/sidebar-user-nav";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   useSidebar,
@@ -117,7 +125,37 @@ export function AppSidebar({ user }: { user: User | undefined }) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarHistory user={user} />
+          <Collapsible defaultOpen className="group/collapsible-chat">
+            <CollapsibleTrigger asChild>
+              <button
+                className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm font-medium text-sidebar-foreground outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&[data-state=open]>svg]:rotate-180"
+                type="button"
+              >
+                Chat
+                <ChevronDown className="size-4 shrink-0 transition-transform duration-200" />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarHistory user={user} />
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Collapsible defaultOpen className="group/collapsible-slides mt-1">
+            <CollapsibleTrigger asChild>
+              <button
+                className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm font-medium text-sidebar-foreground outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&[data-state=open]>svg]:rotate-180"
+                type="button"
+              >
+                Slides
+                <ChevronDown className="size-4 shrink-0 transition-transform duration-200" />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarGroup>
+                <SidebarSlidesHistory user={user} />
+              </SidebarGroup>
+            </CollapsibleContent>
+          </Collapsible>
         </SidebarContent>
         <SidebarFooter>{user && <SidebarUserNav user={user} />}</SidebarFooter>
       </Sidebar>
