@@ -7,7 +7,7 @@ import { memo } from "react";
 import { useWindowSize } from "usehooks-ts";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, VercelIcon } from "./icons";
+import { PlusIcon } from "./icons";
 import { useSidebar } from "./ui/sidebar";
 import { VisibilitySelector, type VisibilityType } from "./visibility-selector";
 
@@ -52,33 +52,18 @@ function PureChatHeader({
         />
       )}
 
-      {/* Oturum yokken Sign in / Sign up; oturum varken Deploy with Vercel */}
-      {session?.user ? (
-        <Button
-          asChild
-          className="order-3 hidden bg-zinc-900 px-2 text-zinc-50 hover:bg-zinc-800 md:ml-auto md:flex md:h-fit dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          <Link
-            href="https://vercel.com/templates/next.js/nextjs-ai-chatbot"
-            rel="noreferrer"
-            target="_blank"
-          >
-            <VercelIcon size={16} />
-            Deploy with Vercel
-          </Link>
-        </Button>
-      ) : (
-        <div className="order-3 flex md:ml-auto md:gap-1">
+      {/* Oturum yokken sağ üstte Sign in / Sign up (giriş yapınca bu alan boş) */}
+      {!session?.user && (
+        <div className="order-3 flex gap-3 md:ml-auto md:gap-3">
           <Button
             asChild
-            className="hidden h-8 px-2 md:flex md:h-fit md:px-2"
-            variant="ghost"
+            className="hidden h-8 px-3 md:flex md:h-fit md:px-3 md:bg-zinc-700 md:text-zinc-100 md:hover:bg-zinc-600 dark:md:bg-zinc-600 dark:md:text-zinc-200 dark:md:hover:bg-zinc-500"
           >
             <Link href="/login">Sign in</Link>
           </Button>
           <Button
             asChild
-            className="hidden h-8 bg-zinc-900 px-2 text-zinc-50 hover:bg-zinc-800 md:flex md:h-fit md:px-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="hidden h-8 bg-zinc-900 px-3 text-zinc-50 hover:bg-zinc-800 md:flex md:h-fit md:px-3 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             <Link href="/register">Sign up</Link>
           </Button>
