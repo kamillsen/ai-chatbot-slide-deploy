@@ -1,6 +1,12 @@
 // Curated list of top models from Vercel AI Gateway
 export const DEFAULT_CHAT_MODEL = "google/gemini-2.5-flash-lite";
 
+// Slayt artifact için metin (başlık + gövde) üreten model; maliyet düşük tutulur.
+export const SLIDES_ARTIFACT_MODEL_ID = "mistral/mistral-nemo";
+
+// Slayt görselleri için görsel üretim modeli (AI Gateway üzerinden).
+export const SLIDES_IMAGE_MODEL_ID = "google/imagen-4.0-fast-generate-001";
+
 export type ChatModel = {
   id: string;
   name: string;

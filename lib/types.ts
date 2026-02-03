@@ -34,6 +34,7 @@ export type CustomUIDataTypes = {
   imageDelta: string;
   sheetDelta: string;
   codeDelta: string;
+  slidesDelta: string; // Slayt artifact stream verisi (JSON string)
   suggestion: Suggestion;
   appendMessage: string;
   id: string;
@@ -55,3 +56,15 @@ export type Attachment = {
   url: string;
   contentType: string;
 };
+
+// Tek bir slayt: document.content JSON içinde kullanılır.
+export type Slide = {
+  id: string;
+  title: string;
+  body: string;
+  imagePrompt?: string;
+  image?: string;
+};
+
+// Slayt listesi; document.content = JSON.stringify(SlidesContent).
+export type SlidesContent = { slides: Slide[] };

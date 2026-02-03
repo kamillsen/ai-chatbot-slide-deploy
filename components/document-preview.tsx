@@ -20,6 +20,7 @@ import { InlineDocumentSkeleton } from "./document-skeleton";
 import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from "./icons";
 import { ImageEditor } from "./image-editor";
 import { SpreadsheetEditor } from "./sheet-editor";
+import { SlidesPreview } from "./ui-slide"; // Chat'ta slayt kare önizlemesi
 import { Editor } from "./text-editor";
 
 type DocumentPreviewProps = {
@@ -134,6 +135,11 @@ const LoadingSkeleton = ({ artifactKind }: { artifactKind: ArtifactKind }) => (
     {artifactKind === "image" ? (
       <div className="overflow-y-scroll rounded-b-2xl border border-t-0 bg-muted dark:border-zinc-700">
         <div className="h-[257px] w-full animate-pulse bg-muted-foreground/20" />
+      </div>
+    ) : artifactKind === "slides" ? (
+      // Slayt yüklenirken iskelet
+      <div className="overflow-y-scroll rounded-b-2xl border border-t-0 bg-muted p-4 dark:border-zinc-700">
+        <InlineDocumentSkeleton />
       </div>
     ) : (
       <div className="overflow-y-scroll rounded-b-2xl border border-t-0 bg-muted p-8 pt-4 dark:border-zinc-700">
@@ -250,6 +256,7 @@ const DocumentContent = ({ document }: { document: Document }) => {
     {
       "p-4 sm:px-14 sm:py-16": document.kind === "text",
       "p-0": document.kind === "code",
+      "p-4": document.kind === "slides", // Slayt önizleme padding
     }
   );
 
@@ -289,6 +296,9 @@ const DocumentContent = ({ document }: { document: Document }) => {
           status={artifact.status}
           title={document.title}
         />
+      ) : document.kind === "slides" ? (
+        // Chat'ta slayt kare önizlemesi (başlıklar + küçük resimler)
+        <SlidesPreview content={document.content ?? ""} />
       ) : null}
     </div>
   );

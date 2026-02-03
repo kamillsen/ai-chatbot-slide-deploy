@@ -5,6 +5,8 @@ import {
   wrapLanguageModel,
 } from "ai";
 import { isTestEnvironment } from "../constants";
+// Slayt metin ve görsel modelleri (lib/ai/models.ts)
+import { SLIDES_ARTIFACT_MODEL_ID, SLIDES_IMAGE_MODEL_ID } from "./models";
 
 const THINKING_SUFFIX_REGEX = /-thinking$/;
 
@@ -59,4 +61,17 @@ export function getArtifactModel() {
     return myProvider.languageModel("artifact-model");
   }
   return gateway.languageModel("anthropic/claude-haiku-4.5");
+}
+
+// Slayt artifact için dil modeli (başlık + gövde metni üretir).
+export function getSlidesArtifactModel() {
+  if (isTestEnvironment && myProvider) {
+    return myProvider.languageModel("artifact-model");
+  }
+  return gateway.languageModel(SLIDES_ARTIFACT_MODEL_ID);
+}
+
+// Slayt görselleri için görsel modeli (AI Gateway image API).
+export function getImageModel() {
+  return gateway.imageModel(SLIDES_IMAGE_MODEL_ID);
 }

@@ -15,6 +15,7 @@ import { useDebounceCallback, useWindowSize } from "usehooks-ts";
 import { codeArtifact } from "@/artifacts/code/client";
 import { imageArtifact } from "@/artifacts/image/client";
 import { sheetArtifact } from "@/artifacts/sheet/client";
+import { slidesArtifact } from "@/artifacts/slides/client"; // Slayt sunumu artifact
 import { textArtifact } from "@/artifacts/text/client";
 import { useArtifact } from "@/hooks/use-artifact";
 import type { Document, Vote } from "@/lib/db/schema";
@@ -34,6 +35,7 @@ export const artifactDefinitions = [
   codeArtifact,
   imageArtifact,
   sheetArtifact,
+  slidesArtifact,
 ];
 export type ArtifactKind = (typeof artifactDefinitions)[number]["kind"];
 
@@ -205,6 +207,32 @@ function PureArtifact({
     }
     return documents[index].content ?? "";
   }
+
+  // Slayt tek öğe güncelleme: başlık / metin / görsel için update-slide-element API çağrılır.
+  const handleDirectUpdate = useCallback(
+    async (
+      documentId: string,
+      payload: {
+        slideId: string;
+        target: "title" | "body" | "image";
+        prompt: string;
+      }
+    ) => {
+      const res = await fetch("/api/document/update-slide-element", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId, ...payload }),
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = (await res.json()) as { content: string };
+      setArtifact((prev) => ({ ...prev, content: data.content }));
+      mutateDocuments();
+      return data.content;
+    },
+    [setArtifact, mutateDocuments]
+  );
 
   const handleVersionChange = (type: "next" | "prev" | "toggle" | "latest") => {
     if (!documents) {
@@ -478,6 +506,13 @@ function PureArtifact({
                 status={artifact.status}
                 suggestions={[]}
                 title={artifact.title}
+                // Slayt paneli: documentId + onDirectUpdate (tek öğe güncelleme) geçirilir.
+                {...(artifact.kind === "slides"
+                  ? {
+                      documentId: artifact.documentId,
+                      onDirectUpdate: handleDirectUpdate,
+                    }
+                  : {})}
               />
 
               <AnimatePresence>

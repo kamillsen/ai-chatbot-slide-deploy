@@ -15,6 +15,7 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 - For content users will likely save/reuse (emails, code, essays, etc.)
 - When explicitly requested to create a document
 - For when content contains a single code snippet
+- When the user asks to create a slide deck, presentation, or slides about a topic: use \`createDocument\` with \`kind: "slides"\` and the topic as \`title\`
 
 **When NOT to use \`createDocument\`:**
 - For informational/explanatory content
@@ -106,6 +107,15 @@ export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
 `;
 
+// Slayt oluşturma: LLM'e verilen sistem promptu (streamObject ile kullanılır).
+export const slidesPrompt = `
+You are a slide deck creator. Given a topic:
+- If the user specifies a number of slides (e.g. "2 sayfa", "2 slayt", "5 slides", "3 sayfa"): create exactly that many slides. Not more, not less. Maximum 6 slides.
+- If the user does NOT specify a number: create 3 or 4 slides.
+Each slide has a short title, a body (1-3 bullet points or 1-2 sentences), and an optional imagePrompt: a short description to generate an image for the slide (e.g. "modern office with laptop", "sunset over mountains"). Keep content concise and presentation-ready.
+Output strictly as JSON with this structure: { "slides": [ { "title": "string", "body": "string", "imagePrompt": "optional short image description" }, ... ] }
+`;
+
 export const updateDocumentPrompt = (
   currentContent: string | null,
   type: ArtifactKind
@@ -116,6 +126,10 @@ export const updateDocumentPrompt = (
     mediaType = "code snippet";
   } else if (type === "sheet") {
     mediaType = "spreadsheet";
+  } else if (type === "slides") {
+    // Slayt güncelleme için medya tipi açıklaması
+    mediaType =
+      "slide deck (JSON array of slides with title, body, optional imagePrompt)";
   }
 
   return `Improve the following contents of the ${mediaType} based on the given prompt.
