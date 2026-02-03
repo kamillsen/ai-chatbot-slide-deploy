@@ -43,6 +43,7 @@ export const {
 } = NextAuth({
   ...authConfig,
   providers: [
+    // Google ile giriş/kayıt (OAuth)
     Google({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
@@ -83,6 +84,7 @@ export const {
     }),
   ],
   callbacks: {
+    // Google ile gelen kullanıcıyı DB'de bul/oluştur, token'a id ve type yaz
     async jwt({ token, user, account }) {
       if (user && account?.provider === "google" && user.email) {
         const dbUser = await getOrCreateUserByEmail(user.email);

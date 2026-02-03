@@ -60,6 +60,7 @@ export default function Page() {
             Create an account with your email and password or sign up with Google
           </p>
         </div>
+        {/* Google ile kayıt butonu ve e-posta formundan ayırıcı */}
         <div className="flex flex-col gap-4 px-4 sm:px-16">
           <Button
             type="button"

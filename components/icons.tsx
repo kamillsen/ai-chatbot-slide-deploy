@@ -17,6 +17,7 @@ export const BotIcon = () => {
   );
 };
 
+/** Login/register sayfalarında "Sign in/up with Google" butonunda kullanılan ikon. */
 export const GoogleIcon = ({ className }: { className?: string }) => {
   return (
     <svg

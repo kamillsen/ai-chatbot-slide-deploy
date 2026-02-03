@@ -62,6 +62,7 @@ export async function createUser(email: string, password: string) {
   }
 }
 
+/** E-postaya göre kullanıcı getirir; yoksa password: null ile yeni kayıt oluşturur (Google OAuth için). */
 export async function getOrCreateUserByEmail(
   email: string
 ): Promise<{ id: string; email: string }> {
