@@ -2,8 +2,10 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { unstable_serialize } from "swr/infinite";
 import { ChatHeader } from "@/components/chat-header";
@@ -48,6 +50,7 @@ export function Chat({
   autoResume: boolean;
 }) {
   const router = useRouter();
+  const { data: session, status: sessionStatus } = useSession();
 
   const { visibilityType } = useChatVisibility({
     chatId: id,
@@ -70,6 +73,7 @@ export function Chat({
 
   const [input, setInput] = useState<string>("");
   const [showCreditCardAlert, setShowCreditCardAlert] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentModelId, setCurrentModelId] = useState(initialChatModel);
   const currentModelIdRef = useRef(currentModelId);
 
@@ -153,6 +157,21 @@ export function Chat({
     },
   });
 
+  // Oturumsuz kullanıcı mesaj göndermeye çalışırsa API yerine auth modal aç
+  const handleSendMessage = useCallback(
+    (
+      message?: Parameters<typeof sendMessage>[0],
+      options?: Parameters<typeof sendMessage>[1]
+    ) => {
+      if (sessionStatus === "unauthenticated" || !session?.user) {
+        setShowAuthModal(true);
+        return Promise.resolve();
+      }
+      return sendMessage(message, options);
+    },
+    [sendMessage, session?.user, sessionStatus]
+  );
+
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
 
@@ -160,7 +179,7 @@ export function Chat({
 
   useEffect(() => {
     if (query && !hasAppendedQuery) {
-      sendMessage({
+      handleSendMessage({
         role: "user" as const,
         parts: [{ type: "text", text: query }],
       });
@@ -168,7 +187,7 @@ export function Chat({
       setHasAppendedQuery(true);
       window.history.replaceState({}, "", `/chat/${id}`);
     }
-  }, [query, sendMessage, hasAppendedQuery, id]);
+  }, [query, handleSendMessage, hasAppendedQuery, id]);
 
   const { data: votes } = useSWR<Vote[]>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
@@ -217,7 +236,7 @@ export function Chat({
               onModelChange={setCurrentModelId}
               selectedModelId={currentModelId}
               selectedVisibilityType={visibilityType}
-              sendMessage={sendMessage}
+              sendMessage={handleSendMessage}
               setAttachments={setAttachments}
               setInput={setInput}
               setMessages={setMessages}
@@ -238,7 +257,7 @@ export function Chat({
         regenerate={regenerate}
         selectedModelId={currentModelId}
         selectedVisibilityType={visibilityType}
-        sendMessage={sendMessage}
+        sendMessage={handleSendMessage}
         setAttachments={setAttachments}
         setInput={setInput}
         setMessages={setMessages}
@@ -246,6 +265,27 @@ export function Chat({
         stop={stop}
         votes={votes}
       />
+
+      {/* Oturumsuz kullanıcı mesaj gönderince: giriş/kayıt modal'ı */}
+      <AlertDialog onOpenChange={setShowAuthModal} open={showAuthModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign in to continue</AlertDialogTitle>
+            <AlertDialogDescription>
+              Sign in or sign up to send messages and save your chat history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Link href="/login">Sign in</Link>
+            </AlertDialogAction>
+            <AlertDialogAction asChild>
+              <Link href="/register">Sign up</Link>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         onOpenChange={setShowCreditCardAlert}

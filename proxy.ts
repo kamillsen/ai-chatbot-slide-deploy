@@ -23,16 +23,14 @@ export async function proxy(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
+  // Oturum yoksa guest'e yönlendirme; site oturumsuz açılsın (Sign in / Sign up ile)
   if (!token) {
-    const redirectUrl = encodeURIComponent(request.url);
-
-    return NextResponse.redirect(
-      new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url)
-    );
+    return NextResponse.next();
   }
 
   const isGuest = guestRegex.test(token?.email ?? "");
 
+  // Giriş yapmış kullanıcı login/register sayfalarına gelirse ana sayfaya yönlendir
   if (token && !isGuest && ["/login", "/register"].includes(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
   }

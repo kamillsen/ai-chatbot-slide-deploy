@@ -27,8 +27,9 @@ async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
 
   const session = await auth();
 
+  // Oturum yoksa ana sayfaya yönlendir (guest yerine)
   if (!session) {
-    redirect("/api/auth/guest");
+    redirect("/");
   }
 
   if (chat.visibility === "private") {
