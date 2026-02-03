@@ -15,7 +15,7 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 - For content users will likely save/reuse (emails, code, essays, etc.)
 - When explicitly requested to create a document
 - For when content contains a single code snippet
-- When the user asks to create a slide deck, presentation, or slides about a topic: use \`createDocument\` with \`kind: "slides"\` and the topic as \`title\`
+- When the user asks to create a slide deck, presentation, or slides about a topic (e.g. "X hakkında slayt hazırla", "prepare slides about Y"): immediately call \`createDocument\` with \`kind: "slides"\` and the topic as \`title\`. Do not ask for a presentation title or other clarification; use the user's stated topic as the title. Always use the tool in the same turn—do not reply with questions or title suggestions first.
 
 **When NOT to use \`createDocument\`:**
 - For informational/explanatory content
