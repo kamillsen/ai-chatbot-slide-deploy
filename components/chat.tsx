@@ -19,6 +19,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useArtifactSelector } from "@/hooks/use-artifact";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
@@ -266,26 +275,25 @@ export function Chat({
         votes={votes}
       />
 
-      {/* Oturumsuz kullanıcı mesaj gönderince: giriş/kayıt modal'ı */}
-      <AlertDialog onOpenChange={setShowAuthModal} open={showAuthModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sign in to continue</AlertDialogTitle>
-            <AlertDialogDescription>
+      {/* Oturumsuz kullanıcı mesaj gönderince: giriş/kayıt modal'ı (sağ üstte X ile kapatma) */}
+      <Dialog onOpenChange={setShowAuthModal} open={showAuthModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sign in to continue</DialogTitle>
+            <DialogDescription>
               Sign in or sign up to send messages and save your chat history.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button asChild variant="outline">
               <Link href="/login">Sign in</Link>
-            </AlertDialogAction>
-            <AlertDialogAction asChild>
+            </Button>
+            <Button asChild>
               <Link href="/register">Sign up</Link>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog
         onOpenChange={setShowCreditCardAlert}

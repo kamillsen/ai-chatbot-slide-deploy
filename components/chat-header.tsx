@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { memo } from "react";
 import { useWindowSize } from "usehooks-ts";
 import { SidebarToggle } from "@/components/sidebar-toggle";
@@ -21,6 +22,7 @@ function PureChatHeader({
 }) {
   const router = useRouter();
   const { open } = useSidebar();
+  const { data: session } = useSession();
 
   const { width: windowWidth } = useWindowSize();
 
@@ -50,19 +52,38 @@ function PureChatHeader({
         />
       )}
 
-      <Button
-        asChild
-        className="order-3 hidden bg-zinc-900 px-2 text-zinc-50 hover:bg-zinc-800 md:ml-auto md:flex md:h-fit dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-      >
-        <Link
-          href={"https://vercel.com/templates/next.js/nextjs-ai-chatbot"}
-          rel="noreferrer"
-          target="_noblank"
+      {/* Oturum yokken Sign in / Sign up; oturum varken Deploy with Vercel */}
+      {session?.user ? (
+        <Button
+          asChild
+          className="order-3 hidden bg-zinc-900 px-2 text-zinc-50 hover:bg-zinc-800 md:ml-auto md:flex md:h-fit dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          <VercelIcon size={16} />
-          Deploy with Vercel
-        </Link>
-      </Button>
+          <Link
+            href="https://vercel.com/templates/next.js/nextjs-ai-chatbot"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <VercelIcon size={16} />
+            Deploy with Vercel
+          </Link>
+        </Button>
+      ) : (
+        <div className="order-3 flex md:ml-auto md:gap-1">
+          <Button
+            asChild
+            className="hidden h-8 px-2 md:flex md:h-fit md:px-2"
+            variant="ghost"
+          >
+            <Link href="/login">Sign in</Link>
+          </Button>
+          <Button
+            asChild
+            className="hidden h-8 bg-zinc-900 px-2 text-zinc-50 hover:bg-zinc-800 md:flex md:h-fit md:px-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            <Link href="/register">Sign up</Link>
+          </Button>
+        </div>
+      )}
     </header>
   );
 }
