@@ -57,7 +57,7 @@ function PureChatHeader({
         <div className="order-3 flex gap-3 md:ml-auto md:gap-3">
           <Button
             asChild
-            className="hidden h-8 px-3 md:flex md:h-fit md:px-3 md:bg-zinc-700 md:text-zinc-100 md:hover:bg-zinc-600 dark:md:bg-zinc-600 dark:md:text-zinc-200 dark:md:hover:bg-zinc-500"
+            className="hidden h-8 px-3 md:flex md:h-fit md:px-3 md:bg-zinc-900 md:text-zinc-100 md:hover:bg-zinc-800 dark:md:bg-zinc-800 dark:md:text-zinc-200 dark:md:hover:bg-zinc-700"
           >
             <Link href="/login">Sign in</Link>
           </Button>
