@@ -1,71 +1,157 @@
-<a href="https://chat.vercel.ai/">
-  <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Chat SDK </h1>
-</a>
+# AI Chatbot — Slayt Oluşturucu
 
-<p align="center">
-    Chat SDK is a free, open-source template built with Next.js and the AI SDK that helps you quickly build powerful chatbot applications.
-</p>
+Next.js ve Vercel AI SDK ile geliştirilmiş, **AI destekli sohbet** ve **otomatik slayt üretimi** sunan açık kaynaklı bir chatbot uygulaması. Vercel AI Chatbot şablonu temel alınmış; Google ile giriş ve slayt (slides) artifact özellikleri eklenmiştir.
 
-<p align="center">
-  <a href="https://chat-sdk.dev"><strong>Read Docs</strong></a> ·
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+---
 
-## Features
+## Özellikler
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://ai-sdk.dev/docs/introduction)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports xAI (default), OpenAI, Fireworks, and other model providers
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Neon Serverless Postgres](https://vercel.com/marketplace/neon) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [Auth.js](https://authjs.dev)
-  - Simple and secure authentication
+### Sohbet ve AI
 
-## Model Providers
+- **Next.js 16** App Router, React Server Components ve Server Actions
+- **Vercel AI SDK** ile metin, yapılandırılmış nesneler ve tool çağrıları
+- **Vercel AI Gateway** üzerinden çoklu model desteği (Anthropic, OpenAI, Google, xAI, Mistral vb.)
+- Sohbet geçmişi, mesaj oylama, önerilen eylemler
 
-This template uses the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) to access multiple AI models through a unified interface. The default configuration includes [xAI](https://x.ai) models (`grok-2-vision-1212`, `grok-3-mini`) routed through the gateway.
+### Slayt (Slides) Artifact
 
-### AI Gateway Authentication
+- Sohbet üzerinden “X konusunda 5 slaytlık sunum yap” gibi taleplerle **otomatik slayt oluşturma**
+- Sol panel: slayt sayfaları listesi, sağ panel: seçili slaytın metin ve görsel içeriği
+- Slayt metinleri ve görselleri **tıklanarak düzenlenebilir**
+- Versiyonlama: önceki/sonraki sürüm geçişi (Undo/Redo, “Back to latest” / “Restore”)
+- Slayt metni için artifact model (örn. Mistral Nemo), görseller için görsel üretim modeli (örn. Imagen)
 
-**For Vercel deployments**: Authentication is handled automatically via OIDC tokens.
+**Slayt oluşturma örnekleri** (tıklayarak büyütebilirsiniz):
 
-**For non-Vercel deployments**: You need to provide an AI Gateway API key by setting the `AI_GATEWAY_API_KEY` environment variable in your `.env.local` file.
+| | |
+|:---:|:---:|
+| [![Slayt oluşturma örneği 1](docs/screenshot-1.png)](docs/screenshot-1.png) | [![Slayt oluşturma örneği 2](docs/screenshot-2.png)](docs/screenshot-2.png) |
+| *Örnek 1* | *Örnek 2* |
 
-With the [AI SDK](https://ai-sdk.dev/docs/introduction), you can also switch to direct LLM providers like [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://ai-sdk.dev/providers/ai-sdk-providers) with just a few lines of code.
+### Diğer Artifact Türleri
 
-## Deploy Your Own
+- Metin (text), kod (code), görsel (image), tablo (sheet) artifact’ları
+- Document tabanlı versiyonlama ve öneri (suggestion) sistemi
 
-You can deploy your own version of the Next.js AI Chatbot to Vercel with one click:
+### Kimlik Doğrulama
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/templates/next.js/nextjs-ai-chatbot)
+- **Auth.js (NextAuth)** ile e-posta/şifre ve **Google OAuth** girişi
+- Oturumsuz kullanıcılar siteyi açar; mesaj göndermeye çalışınca giriş/kayıt modal’ı açılır
+- Slayt ve sohbet verileri kullanıcı bazlı yönetilir
 
-## Running locally
+### Veri ve Altyapı
 
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Next.js AI Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
+- **PostgreSQL** (Drizzle ORM): kullanıcı, sohbet, mesaj, oy, document, suggestion
+- **Vercel Blob**: dosya yükleme ve depolama
+- **Redis**: (isteğe bağlı) oturum/önbellek
+- **shadcn/ui** + **Tailwind CSS** + **Radix UI** ile erişilebilir arayüz
 
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various AI and authentication provider accounts.
+---
 
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
+## Gereksinimler
+
+- Node.js 18+
+- pnpm 9+
+- PostgreSQL (yerel için Docker Compose ile sağlanabilir)
+
+---
+
+## Kurulum
+
+### 1. Bağımlılıkları yükle
 
 ```bash
 pnpm install
-pnpm db:migrate # Setup database or apply latest database changes
+```
+
+### 2. Ortam değişkenleri
+
+`.env.example` dosyasını `.env.local` olarak kopyalayıp doldur:
+
+```bash
+cp .env.example .env.local
+```
+
+**Zorunlu / önerilen değişkenler:**
+
+| Değişken | Açıklama |
+|----------|----------|
+| `AUTH_SECRET` | Auth.js için gizli anahtar ([örnek](https://generate-secret.vercel.app/32) veya `openssl rand -base64 32`) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth ([Google Cloud Console](https://console.cloud.google.com/apis/credentials)) |
+| `AI_GATEWAY_API_KEY` | Vercel dışında deploy için AI Gateway API anahtarı |
+| `POSTGRES_URL` | PostgreSQL bağlantı URL’si |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob depolama (dosya yükleme) |
+| `REDIS_URL` | İsteğe bağlı Redis |
+
+**Yerel PostgreSQL (Docker):**
+
+```bash
+docker compose up -d
+```
+
+`.env.local` içinde:
+
+```env
+POSTGRES_URL=postgresql://postgres:postgres@localhost:55432/ai_chatbot
+```
+
+### 3. Veritabanı migrasyonu
+
+```bash
+pnpm db:migrate
+```
+
+### 4. Geliştirme sunucusu
+
+```bash
 pnpm dev
 ```
 
-Your app template should now be running on [localhost:3000](http://localhost:3000).
+Uygulama varsayılan olarak [http://localhost:3000](http://localhost:3000) adresinde çalışır.
+
+---
+
+## Vercel ile deploy
+
+1. Projeyi Vercel’e bağla; ortam değişkenlerini Vercel paneline ekle.
+2. AI Gateway, Blob ve Postgres için Vercel entegrasyonları kullanılabilir; Vercel deploy’da AI Gateway için OIDC token otomatik kullanılır.
+3. Build komutu: `pnpm build` (içeride `db:migrate` çalışır).
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-chatbot)
+
+---
+
+## Proje yapısı (özet)
+
+| Bölüm | Açıklama |
+|-------|----------|
+| `app/(auth)/` | Giriş, kayıt, Auth API (NextAuth) |
+| `app/(chat)/` | Sohbet sayfaları, chat/document/slides API’leri |
+| `artifacts/` | Slayt, metin, kod, görsel, tablo artifact bileşenleri |
+| `components/` | Sohbet, mesaj, artifact, sidebar, UI bileşenleri |
+| `components/ui-slide/` | Slayt önizleme ve slayt içeriği bileşenleri |
+| `lib/ai/` | Model tanımları, prompt’lar, tool’lar |
+| `lib/db/` | Drizzle şeması, migrasyonlar, sorgular |
+| `docs/` | Slayt artifact gereksinimleri, case ve teknik notlar |
+
+---
+
+## Komutlar
+
+| Komut | Açıklama |
+|-------|----------|
+| `pnpm dev` | Geliştirme sunucusu (Turbopack) |
+| `pnpm build` | DB migrasyon + Next.js build |
+| `pnpm start` | Production sunucusu |
+| `pnpm db:migrate` | Veritabanı migrasyonlarını uygula |
+| `pnpm db:generate` | Drizzle migration dosyalarını üret |
+| `pnpm db:studio` | Drizzle Studio (DB arayüzü) |
+| `pnpm lint` | Ultracite ile lint |
+| `pnpm format` | Ultracite ile format |
+| `pnpm test` | Playwright E2E testleri |
+
+---
+
+## Lisans
+
+Proje [LICENSE](LICENSE) dosyasındaki koşullara tabidir. Vercel AI Chatbot şablonu temel alınmıştır.
